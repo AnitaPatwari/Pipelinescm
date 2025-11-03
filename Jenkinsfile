@@ -1,15 +1,31 @@
 pipeline {
-    agent any
-    stages {
-        stage('Hello') {
-            steps {
-                bat """
-                @echo off
-                echo === Project 1: Hello Jenkins ===
-                echo Hello from Project 1!
-                dir
-                """
-            }
-        }
+  agent any
+  options { timestamps() }
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        sh 'echo "✅ Code checkout complete."'
+      }
     }
+    stage('Build') {
+      steps {
+        sh '''
+          echo "🔨 Building the project..."
+          mkdir -p build
+          echo "Hello from Jenkins" > build/hello.txt
+        '''
+      }
+    }
+    stage('Archive') {
+      steps {
+        archiveArtifacts artifacts: 'build/hello.txt', fingerprint: true
+        sh 'echo "📦 hello.txt archived."'
+      }
+    }
+  }
+  post {
+    success { echo '✅ Pipeline completed successfully!' }
+    always { junit allowEmptyResults: true, testResults: '' }
+  }
 }
