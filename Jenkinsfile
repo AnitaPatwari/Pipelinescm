@@ -1,31 +1,35 @@
 pipeline {
   agent any
-  options { timestamps() }
+
+  parameters {
+    string(name: 'FOLDER', defaultValue: '/tmp', description: 'Folder to check/create')
+  }
+
   stages {
-    stage('Checkout') {
+    stage('Check Folder') {
       steps {
-        checkout scm
-        sh 'echo "✅ Code checkout complete."'
-      }
-    }
-    stage('Build') {
-      steps {
+        // Use single-quoted multiline so the shell expands $FOLDER at build time
         sh '''
-          echo "🔨 Building the project..."
-          mkdir -p build
-          echo "Hello from Jenkins" > build/hello.txt
+          set -e
+
+          TARGET="${FOLDER}"
+
+          echo "=== Project 4: Check Folder ==="
+          echo "Checking folder: ${TARGET}"
+
+          if [ -d "${TARGET}" ]; then
+            echo "Folder exists: ${TARGET}"
+          else
+            echo "Folder not found. Creating: ${TARGET}"
+            mkdir -p "${TARGET}"
+            echo "Created: ${TARGET}"
+          fi
+
+          echo "Done."
         '''
       }
     }
-    stage('Archive') {
-      steps {
-        archiveArtifacts artifacts: 'build/hello.txt', fingerprint: true
-        sh 'echo "📦 hello.txt archived."'
-      }
-    }
-  }
-  post {
-    success { echo '✅ Pipeline completed successfully!' }
-    always { junit allowEmptyResults: true, testResults: '' }
   }
 }
+
+
