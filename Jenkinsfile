@@ -1,35 +1,34 @@
-pipeline {
-  agent any
+#!/bin/bash
 
-  parameters {
-    string(name: 'FOLDER', defaultValue: '/tmp', description: 'Folder to check/create')
-  }
+echo "=== 🐧 Freestyle Linux System Report ==="
+echo "User        : $USER"
+echo "Hostname    : $(hostname)"
+echo "Uptime      : $(uptime -p)"
+echo "Date & Time : $(date)"
+echo "OS          : $(uname -o)"
+echo "Kernel      : $(uname -r)"
+echo "Shell       : $SHELL"
+echo
 
-  stages {
-    stage('Check Folder') {
-      steps {
-        // Use single-quoted multiline so the shell expands $FOLDER at build time
-        sh '''
-          set -e
+echo "--- 🧠 Memory Info ---"
+free -h
+echo
 
-          TARGET="${FOLDER}"
+echo "--- 💾 Disk Usage ---"
+df -h --total | grep total
+echo
 
-          echo "=== Project 4: Check Folder ==="
-          echo "Checking folder: ${TARGET}"
+echo "--- 👥 Logged-in Users ---"
+who
+echo
 
-          if [ -d "${TARGET}" ]; then
-            echo "Folder exists: ${TARGET}"
-          else
-            echo "Folder not found. Creating: ${TARGET}"
-            mkdir -p "${TARGET}"
-            echo "Created: ${TARGET}"
-          fi
+echo "--- 💡 Random Motivation ---"
+shuf -n 1 <<EOF
+"Stay hungry, stay foolish." – Steve Jobs
+"Talk is cheap. Show me the code." – Linus Torvalds
+"First, solve the problem. Then, write the code." – John Johnson
+"Code is like humor. When you have to explain it, it’s bad." – Cory House
+EOF
 
-          echo "Done."
-        '''
-      }
-    }
-  }
-}
-
-
+echo
+echo "=== ✅ Report Complete ==="
